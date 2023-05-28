@@ -15,61 +15,143 @@ namespace SoftwareAgenda
 {
     public class Program
     {
-        static void Main(string[] args)
+        public static void TomadaDeDecisao()
+        {
+            Console.Write("");
+            bool finalizarPrograma = false;
+
+            do
+            {
+                Console.WriteLine("( 00 ) Sair | ( 01 ) Editar | ( 02 ) Excluir");
+                Console.Write(">> ");
+                int opcaoDoMenu = int.Parse(Console.ReadLine());
+
+                switch (opcaoDoMenu)
+                {
+                    case 00:
+                        finalizarPrograma = true;
+                        break;
+
+                    case 01:
+                        break;
+
+                    case 02:
+                        break;
+
+                    default:
+                        Console.Write("OPÇÃO INVÁLIDA!");
+                        break;
+                }
+            } while (!finalizarPrograma);
+        }
+
+        public static void OpcaoMenuCadastro()
         {
             bool finalizarPrograma = false;
 
             do
             {
-                Console.WriteLine("***********************************");
-                Console.WriteLine("*       AGENDA DE CONTATOS        *");
-                Console.WriteLine("***********************************");
-
-            
-                Console.WriteLine("\n       ####### MENU #######       \n");
-                Console.WriteLine("\t( 00 ) SAIR");
-                Console.WriteLine("\t( 01 ) CADASTRO");
-                Console.WriteLine("\t( 02 ) CADASTRO DE USUÁRIO");
-                Console.WriteLine("\t( 03 ) CIDADES DA BAHIA");
-                Console.WriteLine("\t( 04 ) EDITAR/EXCLUIR USUÁRIO");
-                Console.WriteLine("\t( 05 ) CADASTRO DO LOCAL");
-                Console.WriteLine("\t( 06 ) BUSCAR DADO DO LOCAL");
+                Console.Clear();
+                Console.WriteLine("\n\n");
+                Console.WriteLine("\t( 00 ) SAIR"); //OK
+                Console.WriteLine("\t( 01 ) CADASTRO DE USUÁRIO"); //OK
+                Console.WriteLine("\t( 02 ) CADASTRO DO LOCAL"); //OK
 
                 Console.Write("\t>> ");
                 int opcaoDoMenu = int.Parse(Console.ReadLine());
 
                 switch (opcaoDoMenu)
                 {
-                    case 01:
-                        CadastroPessoaFisica.CadastroDaInformacaoDePessoalFisica();
+                    case 00:
+                        finalizarPrograma = true;
                         break;
-
-                    case 02:
+                    case 01:
                         CadastroPessoaFisica.CadastroDeUsuario();
                         break;
+                    case 02:
+                        CadastroDoEstabelecimento.cadastroDeDadosDoEstabelecimento();
+                        break;
+                }
+            } while (!finalizarPrograma);
+        }
 
-                    case 03:
-                        CidadesDaBahia.CidadesComCICOM();
+        public static void OpcaoMenuPesquisa()
+        {
+            bool finalizarPrograma = false;
+
+            do
+            {
+                Console.Clear();
+                Console.WriteLine("\n\n");
+                Console.WriteLine("\t( 00 ) SAIR"); //OK
+                Console.WriteLine("\t( 01 ) PESQUISAR USUÁRIO"); //OK
+                Console.WriteLine("\t( 02 ) PESQUISAR CICOM"); //OK
+
+                Console.Write("\t>> ");
+                int opcaoDoMenu = int.Parse(Console.ReadLine());
+
+                switch (opcaoDoMenu)
+                {
+                    case 00:
+                        finalizarPrograma = true;
                         break;
 
-                    case 04:
-                        Console.Write("Pesquise pelo CPF: ");
+                    case 01:
+                        Console.Write("CPF: ");
                         ulong cadDeUsuarioComCPF = ulong.Parse(Console.ReadLine());
                         BancoDeDadosDoSistema.BuscarDadosDoUsuario(cadDeUsuarioComCPF);
                         break;
 
-                    case 05:
-                        CadastroDoEstabelecimento.cadastroDeDadosDoEstabelecimento();
-                        break;
-
-                    case 06:
-                        Console.Write("Nome da cidade do CICOM: ");
+                    case 02:
+                        Console.Write("CICOM: ");
                         string cidadeDoEstabelecimento = Console.ReadLine();
                         BancoDeDadosDoSistema.BuscarDadosDoEstabelecimento(cidadeDoEstabelecimento);
                         break;
 
-                    case 0:
+                    default:
+                        Console.Write("OPÇÃO INVÁLIDA!");
+                        break;
+                }
+
+            } while (!finalizarPrograma);
+        }
+
+        static void Main(string[] args)
+        {
+            bool finalizarPrograma = false;
+
+            do
+            {
+                Console.WriteLine("********************************************");
+                Console.WriteLine("*            AGENDA DE CONTATOS            *");
+                Console.WriteLine("********************************************");
+
+            
+                Console.WriteLine("\n       ####### MENU #######       \n");
+                Console.WriteLine("\t( 00 ) SAIR"); //OK
+                Console.WriteLine("\t( 01 ) CADASTRO");
+                Console.WriteLine("\t( 02 ) CIDADES DA BAHIA");
+                Console.WriteLine("\t( 03 ) PESQUISAR"); //OK
+
+                Console.Write("\t>> ");
+                int opcaoDoMenu = int.Parse(Console.ReadLine());
+
+                switch (opcaoDoMenu)
+                {
+                    case 00:
                         finalizarPrograma = true;
+                        break;
+
+                    case 01:
+                        OpcaoMenuCadastro();
+                        break;
+
+                    case 02:
+                        CidadesDaBahia.CidadesComCICOM();
+                        break;
+
+                    case 03:
+                        OpcaoMenuPesquisa();
                         break;
 
                     default:
@@ -277,7 +359,7 @@ namespace SoftwareAgenda
         }
 
         // Função para criar a tabela "TB_contatoDoEstabelecimento"
-        public static void CriarTabelaContatoEstabelecimento()
+        public static void CriarTabelaDadosDoEstabelecimento()
         {
             // Conectar ao banco de dados
             using (SQLiteConnection conexao = ConexaoBancoDeDados())
@@ -291,41 +373,48 @@ namespace SoftwareAgenda
             }
         }
 
+        public static void CriarTabelaDadosDoUsuario()
+        {
+            // Conectar ao banco de dados
+            using (SQLiteConnection conexao = ConexaoBancoDeDados())
+            {
+                // Criar a tabela "TB_usuario"
+                string createTableQuery = "CREATE TABLE IF NOT EXISTS TB_usuario (id INTEGER PRIMARY KEY AUTOINCREMENT, cadDeUsuarioNomeCompleto TEXT, cadDeUsuarioComEmail TEXT, cadDeUsuarioComContato TEXT, cadDeUsuarioComNascimento DECIMAL, cadDeUsuarioComSexo TEXT, cadDeUsuarioComCPF DECIMAL, cadDeUsuarioNivel TEXT)";
+                using (SQLiteCommand createTableCommand = new SQLiteCommand(createTableQuery, conexao))
+                {
+                    createTableCommand.ExecuteNonQuery();
+                }
+            }
+        }
+
         public static void DB_InserirRegistroDoUsuario(string cadDeUsuarioNomeCompleto, string cadDeUsuarioComEmail, int cadDeUsuarioComContato, int cadDeUsuarioComNascimento, string cadDeUsuarioComSexo, ulong cadDeUsuarioComCPF, string cadDeUsuarioNivel)
         {
-            CriarBancoDeDados();
+            CriarTabelaDadosDoUsuario();
 
             // Conectar ao banco de dados
-            SQLiteConnection conexao = ConexaoBancoDeDados();
-
-            // Criar a tabela "TB_usuario"
-            string createTableQuery = "CREATE TABLE IF NOT EXISTS TB_usuario (id INTEGER PRIMARY KEY AUTOINCREMENT, cadDeUsuarioNomeCompleto TEXT, cadDeUsuarioComEmail TEXT, cadDeUsuarioComContato TEXT, cadDeUsuarioComNascimento DECIMAL, cadDeUsuarioComSexo TEXT, cadDeUsuarioComCPF DECIMAL, cadDeUsuarioNivel TEXT)";
-            using (SQLiteCommand createTableCommand = new SQLiteCommand(createTableQuery, conexao))
+            using (SQLiteConnection conexao = ConexaoBancoDeDados())
             {
-                createTableCommand.ExecuteNonQuery();
+                // Inserir registros na tabela "TB_usuario"
+                string insertQuery = "INSERT INTO TB_usuario (cadDeUsuarioNomeCompleto, cadDeUsuarioComEmail, cadDeUsuarioComContato, cadDeUsuarioComNascimento, cadDeUsuarioComSexo, cadDeUsuarioComCPF) VALUES (@cadDeUsuarioNomeCompleto, @cadDeUsuarioComEmail, @cadDeUsuarioComContato, @cadDeUsuarioComNascimento, @cadDeUsuarioComSexo, @cadDeUsuarioComCPF)";
+                using (SQLiteCommand insertCommand = new SQLiteCommand(insertQuery, conexao))
+                {
+                    insertCommand.Parameters.AddWithValue("@cadDeUsuarioNomeCompleto", cadDeUsuarioNomeCompleto);
+                    insertCommand.Parameters.AddWithValue("@cadDeUsuarioComEmail", cadDeUsuarioComEmail);
+                    insertCommand.Parameters.AddWithValue("@cadDeUsuarioComContato", cadDeUsuarioComContato);
+                    insertCommand.Parameters.AddWithValue("@cadDeUsuarioComNascimento", cadDeUsuarioComNascimento);
+                    insertCommand.Parameters.AddWithValue("@cadDeUsuarioComSexo", cadDeUsuarioComSexo);
+                    insertCommand.Parameters.AddWithValue("@cadDeUsuarioComCPF", cadDeUsuarioComCPF);
+                    insertCommand.Parameters.AddWithValue("@cadDeUsuarioNivel", cadDeUsuarioNivel);
+
+                    insertCommand.ExecuteNonQuery();
+
+                    Console.WriteLine();
+                    Console.WriteLine("\nCADASTRO REALIZADO COM SUCESSO!\n");
+                }
+
+                // Fechar a conexão
+                conexao.Close();
             }
-
-            Console.WriteLine();
-            Console.WriteLine("Banco de dados e tabela criados com sucesso!");
-
-            // Inserir registros na tabela "TB_usuario"
-            string insertQuery = "INSERT INTO TB_usuario (cadDeUsuarioNomeCompleto, cadDeUsuarioComEmail, cadDeUsuarioComContato, cadDeUsuarioComNascimento, cadDeUsuarioComSexo, cadDeUsuarioComCPF) VALUES (@cadDeUsuarioNomeCompleto, @cadDeUsuarioComEmail, @cadDeUsuarioComContato, @cadDeUsuarioComNascimento, @cadDeUsuarioComSexo, @cadDeUsuarioComCPF)";
-            using (SQLiteCommand insertCommand = new SQLiteCommand(insertQuery, conexao))
-            {
-                insertCommand.Parameters.AddWithValue("@cadDeUsuarioNomeCompleto", cadDeUsuarioNomeCompleto);
-                insertCommand.Parameters.AddWithValue("@cadDeUsuarioComEmail", cadDeUsuarioComEmail);
-                insertCommand.Parameters.AddWithValue("@cadDeUsuarioComContato", cadDeUsuarioComContato);
-                insertCommand.Parameters.AddWithValue("@cadDeUsuarioComNascimento", cadDeUsuarioComNascimento);
-                insertCommand.Parameters.AddWithValue("@cadDeUsuarioComSexo", cadDeUsuarioComSexo);
-                insertCommand.Parameters.AddWithValue("@cadDeUsuarioComCPF", cadDeUsuarioComCPF);
-                insertCommand.Parameters.AddWithValue("@cadDeUsuarioNivel", cadDeUsuarioNivel);
-
-                insertCommand.ExecuteNonQuery();
-
-                Console.WriteLine();
-                Console.WriteLine("\nCADASTRO REALIZADO COM SUCESSO!\n");
-            }
-            conexao.Close();
         }
         public static void BuscarDadosDoUsuario(ulong cadDeUsuarioComCPF)
         {
@@ -390,6 +479,8 @@ namespace SoftwareAgenda
                         CPF da pessoa: {CPF}
                         Nível de acesso: {cadDeUsuarioNivel}
                     ");
+
+                    Program.TomadaDeDecisao();
                 }
             }
             else
@@ -405,7 +496,7 @@ namespace SoftwareAgenda
         public static void DB_InserirRegistroEstabelecimento(string nomeDoEstabelecimento, string cidadeDoEstabelecimento, string enderecoDoEstabelecimento, int contatoDoEstabelecimento1, int contatoDoEstabelecimento2, int contatoDoEstabelecimento3)
         {
             //CriarBancoDeDados();
-            CriarTabelaContatoEstabelecimento();
+            CriarTabelaDadosDoEstabelecimento();
 
             // Conectar ao banco de dados
             using (SQLiteConnection conexao = ConexaoBancoDeDados())
